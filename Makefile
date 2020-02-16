@@ -12,3 +12,6 @@ open-postgres-console:
 
 create-db:
 	docker exec -it local_postgres psql -U postgres -c "create database diesel_demo"
+
+add-current-user:
+	docker exec -it local_postgres psql -U postgres -c "CREATE ROLE ${USER} WITH SUPERUSER LOGIN;"
