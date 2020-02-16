@@ -45,6 +45,3 @@ RUN apt-get update \
 
 # Switch back to dialog for any ad-hoc use of apt-get
 ENV DEBIAN_FRONTEND=dialog
-
-
-RUN cargo install diesel_cli --no-default-features --features postgres 2>&1
