@@ -13,7 +13,7 @@ fn init_pool(database_url: &str) -> Result<PgPool, PoolError> {
 
 embed_migrations!("./migrations");
 
-pub fn establish_connection() -> PgPool {
+pub fn establish_pool() -> PgPool {
     dotenv().ok();
 
     let database_url = env::var("DATABASE_URL")

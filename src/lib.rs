@@ -1,27 +1,32 @@
 #[macro_use] extern crate diesel;
 #[macro_use] extern crate diesel_migrations;
+#[macro_use] extern crate juniper;
+#[macro_use] extern crate log;
+
+extern crate diesel_derive_enum;
 extern crate dotenv;
 
-use diesel::prelude::*;
-use diesel::pg::PgConnection;
-
-pub mod schema;
-pub mod models;
-pub mod graphql_resolvers;
 pub mod db;
+pub mod models;
+pub mod graphql;
+pub mod schema;
 
-use self::models::{Post, NewPost};
-
-pub fn create_post<'a>(conn: &PgConnection, title: String, body: String) -> Post {
-    use schema::posts;
-
-    let new_post = NewPost {
-        title: title,
-        body: body,
-    };
-
-    diesel::insert_into(posts::table)
-        .values(&new_post)
-        .get_result(conn)
-        .expect("Error saving new post")
+pub fn hello_world() -> &'static str {
+  "hello world"
 }
+
+// use self::models::{NewPost, Post};
+
+// pub fn create_post<'a>(conn: &PgConnection, title: String, body: String) -> Post {
+//   use schema::posts;
+
+//   let new_post = NewPost {
+//     title: title,
+//     body: body,
+//   };
+
+//   diesel::insert_into(posts::table)
+//     .values(&new_post)
+//     .get_result(conn)
+//     .expect("Error saving new post")
+// }

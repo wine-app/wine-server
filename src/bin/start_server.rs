@@ -3,8 +3,6 @@ extern crate dotenv;
 extern crate env_logger;
 extern crate serde_json;
 extern crate wine_server;
-#[macro_use]
-extern crate log;
 
 use actix_web::{middleware, web, App, Error, HttpResponse, HttpServer};
 use dotenv::dotenv;
@@ -14,8 +12,8 @@ use juniper::RootNode;
 use std::io;
 use std::sync::Arc;
 
-use wine_server::db::establish_connection;
-use wine_server::graphql_resolvers::{GraphqlContext, RootQuery, RootMutation};
+use wine_server::db::establish_pool;
+use wine_server::graphql::{GraphqlContext, RootQuery, RootMutation};
 
 type Schema = RootNode<'static, RootQuery, RootMutation>;
 
@@ -53,7 +51,7 @@ async fn main() -> io::Result<()> {
   std::env::set_var("RUST_LOG", "actix_web=debug");
   env_logger::init();
 
-  let db_pool = establish_connection();
+  let db_pool = establish_pool();
 
   // Create Juniper schema
   let schema = Schema::new(RootQuery, RootMutation);

@@ -1,0 +1,15 @@
+{
+  "sqltools.connections": [
+    {
+      "askForPassword": false,
+      "database": "wine_server",
+      "dialect": "PostgreSQL",
+      "isActive": false,
+      "isConnected": false,
+      "name": "local-postgres",
+      "port": 54320,
+      "server": "localhost",
+      "username": "jdylanstewart"
+    }
+  ]
+}
