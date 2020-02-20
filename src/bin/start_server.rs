@@ -40,6 +40,14 @@ async fn graphql(
   )
 }
 
+async fn index() -> Result<HttpResponse, Error> {
+  Ok(
+    HttpResponse::Ok()
+      .content_type("application/json")
+      .body("hello there"),
+  )
+}
+
 struct RequestContext {
   schema: Schema,
   graphql_context: GraphqlContext,
@@ -66,10 +74,11 @@ async fn main() -> io::Result<()> {
     App::new()
       .data(context.clone())
       .wrap(middleware::Logger::default())
+      .service(web::resource("/").route(web::get().to(index)))
       .service(web::resource("/graphql").route(web::post().to(graphql)))
       .service(web::resource("/graphiql").route(web::get().to(graphiql)))
   })
-  .bind("127.0.0.1:8080")?
+  .bind("0.0.0.0:8080")?
   .run()
   .await
 }

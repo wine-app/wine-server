@@ -3,6 +3,7 @@ use diesel::prelude::*;
 use juniper::FieldResult;
 
 use super::*;
+use crate::PrependError;
 use crate::graphql::wine::*;
 
 pub struct RootMutation;
@@ -19,7 +20,7 @@ impl RootMutation {
     let inserted_item = diesel::insert_into(grapes::table)
       .values(new_item)
       .get_result::<DbGrape>(&connection)
-      .expect("Error creating new grape");
+      .prepend_err("Error creating new grape")?;
 
     Ok(inserted_item.name)
   }
@@ -31,7 +32,7 @@ impl RootMutation {
 
     let result: DbGrape = diesel::delete(grapes.find(name))
       .get_result(&connection)
-      .expect("Error deleting a grape");
+      .prepend_err("Error deleting a grape")?;
 
     Ok(result.name)
   }
@@ -48,7 +49,7 @@ impl RootMutation {
     let result: DbGrape = diesel::update(grapes.find(old_name))
       .set(name.eq(new_name))
       .get_result(&connection)
-      .expect("Error updating a grape");
+      .prepend_err("Error updating a grape")?;
 
     Ok(result.name)
   }
@@ -61,7 +62,7 @@ impl RootMutation {
     let inserted_item = diesel::insert_into(countries::table)
       .values(DbCountry { name })
       .get_result::<DbCountry>(&connection)
-      .expect("Error creating new country");
+      .prepend_err("Error creating new country")?;
 
     Ok(inserted_item.name)
   }
@@ -73,7 +74,7 @@ impl RootMutation {
 
     let result: DbCountry = diesel::delete(countries.find(name))
       .get_result(&connection)
-      .expect("Error deleteing a country");
+      .prepend_err("Error deleteing a country")?;
 
     Ok(result.name)
   }
@@ -90,7 +91,7 @@ impl RootMutation {
     let result: DbCountry = diesel::update(countries.find(old_name))
       .set(name.eq(new_name))
       .get_result(&connection)
-      .expect("Error updating a country");
+      .prepend_err("Error updating a country")?;
 
     Ok(result.name)
   }
@@ -103,7 +104,7 @@ impl RootMutation {
     let inserted_item = diesel::insert_into(regions::table)
       .values(DbRegion { name })
       .get_result::<DbRegion>(&connection)
-      .expect("Error creating new region");
+      .prepend_err("Error creating new region")?;
 
     Ok(inserted_item.name)
   }
@@ -115,7 +116,7 @@ impl RootMutation {
 
     let result: DbRegion = diesel::delete(regions.find(name))
       .get_result(&connection)
-      .expect("Error deleting a region");
+      .prepend_err("Error deleting a region")?;
 
     Ok(result.name)
   }
@@ -132,7 +133,7 @@ impl RootMutation {
     let result: DbRegion = diesel::update(regions.find(old_name))
       .set(name.eq(new_name))
       .get_result(&connection)
-      .expect("Error updating a region");
+      .prepend_err("Error updating a region")?;
 
     Ok(result.name)
   }
@@ -145,7 +146,7 @@ impl RootMutation {
     let inserted_item = diesel::insert_into(producers::table)
       .values(DbProducer { name })
       .get_result::<DbProducer>(&connection)
-      .expect("Error creating new producer");
+      .prepend_err("Error creating new producer")?;
 
     Ok(inserted_item.name)
   }
@@ -157,7 +158,7 @@ impl RootMutation {
 
     let result: DbProducer = diesel::delete(producers.find(name))
       .get_result(&connection)
-      .expect("Error deleting a producer");
+      .prepend_err("Error deleting a producer")?;
 
     Ok(result.name)
   }
@@ -174,7 +175,7 @@ impl RootMutation {
     let result: DbProducer = diesel::update(producers.find(old_name))
       .set(name.eq(new_name))
       .get_result(&connection)
-      .expect("Error updating a producer");
+      .prepend_err("Error updating a producer")?;
 
     Ok(result.name)
   }
@@ -194,7 +195,7 @@ impl RootMutation {
       let wine_insert_result = diesel::insert_into(wines::table)
         .values(new_wine)
         .get_result::<DbWine>(&connection)
-        .expect("Error creating new wine");
+        .prepend_err("Error creating new wine")?;
 
       let composition_insert_result = diesel::insert_into(compositions::table)
         .values(
@@ -208,7 +209,7 @@ impl RootMutation {
             .collect::<Vec<DbComposition>>(),
         )
         .get_result::<DbComposition>(&connection)
-        .expect("Error inserting compositions");
+        .prepend_err("Error inserting compositions")?;
 
       Ok(wine_insert_result.into())
     })
@@ -221,7 +222,7 @@ impl RootMutation {
 
     let result: DbWine = diesel::delete(wines.find(id))
       .get_result(&connection)
-      .expect("Error deleting a wine");
+      .prepend_err("Error deleting a wine")?;
 
     Ok(result.id)
   }
@@ -242,7 +243,7 @@ impl RootMutation {
       let inserted_wine = diesel::update(wines.find(id))
         .set(&update_item)
         .get_result::<DbWine>(&connection)
-        .expect("Error creating new wine");
+        .prepend_err("Error updating a wine")?;
 
       let db_input_compositions = input_compositions
         .into_iter()
@@ -259,7 +260,7 @@ impl RootMutation {
         .do_update()
         .set(percent.eq(excluded(percent)))
         .get_results(&connection)
-        .expect("Error updating compositions");
+        .prepend_err("Error updating a wine")?;
 
       Ok(inserted_wine.into())
     })

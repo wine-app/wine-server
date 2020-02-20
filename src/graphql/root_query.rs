@@ -1,6 +1,7 @@
 use juniper::FieldResult;
 use diesel::prelude::*;
 
+use crate::PrependError;
 use crate::models::*;
 use crate::graphql::GraphqlContext;
 use super::wine::Wine as GraphQLWine;

@@ -1,11 +1,12 @@
-use juniper::FieldResult;
 use diesel::prelude::*;
+use juniper::FieldResult;
 
 use crate::graphql::GraphqlContext;
+use crate::models::Composition as DbComposition;
 use crate::models::Wine as DbWine;
 use crate::models::WineInput as DbWineInput;
 use crate::models::WineIntensity as DbWineIntensity;
-use crate::models::Composition as DbComposition;
+use crate::PrependError;
 
 #[derive(juniper::GraphQLEnum, Debug)]
 pub enum WineIntensity {
@@ -130,7 +131,10 @@ impl Wine {
     use crate::schema::compositions::dsl::*;
     let connection = context.db_pool.get()?;
 
-    let result: Vec<DbComposition> = compositions.filter(wine_id.eq(self.id)).load(&connection)?;
+    let result: Vec<DbComposition> = compositions
+      .filter(wine_id.eq(self.id))
+      .load(&connection)
+      .prepend_err("Error retrieving compositions")?;
     Ok(result.into_iter().map(|x| x.into()).collect())
   }
 }
@@ -180,18 +184,18 @@ impl From<WineInput> for DbWineInput {
 // impl From<Wine> for WineInput {
 //   fn from(item: Wine) -> WineInput {
 //     WineInput {
-      // name: item.name,
-      // producer: item.producer,
-      // vintage: item.vintage,
-      // region: item.region,
-      // country: item.country,
-      // sparkling: item.sparkling,
-      // sweetness: item.sweetness,
-      // tannin: item.tannin,
-      // acid: item.acid,
-      // alcohol: item.alcohol,
-      // body: item.body,
-      // intensity: item.intensity,
+// name: item.name,
+// producer: item.producer,
+// vintage: item.vintage,
+// region: item.region,
+// country: item.country,
+// sparkling: item.sparkling,
+// sweetness: item.sweetness,
+// tannin: item.tannin,
+// acid: item.acid,
+// alcohol: item.alcohol,
+// body: item.body,
+// intensity: item.intensity,
 //       composition: item.composition(context: &GraphqlContext)
 //     }
 //   }

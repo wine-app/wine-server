@@ -15,10 +15,10 @@ CREATE TABLE producers (
 CREATE TABLE wines (
   id SERIAL PRIMARY KEY,
   name VARCHAR NOT NULL CHECK (name <> ''),
-  producer VARCHAR REFERENCES producers(name) NOT NULL ON DELETE CASCADE,
+  producer VARCHAR REFERENCES producers(name) ON DELETE CASCADE NOT NULL,
   vintage INTEGER NOT NULL CHECK (vintage >= 1900),
-  region VARCHAR REFERENCES regions(name) NOT NULL ON DELETE CASCADE,
-  country VARCHAR REFERENCES countries(name) NOT NULL ON DELETE CASCADE,
+  region VARCHAR REFERENCES regions(name) ON DELETE CASCADE NOT NULL,
+  country VARCHAR REFERENCES countries(name) ON DELETE CASCADE NOT NULL,
   sparkling BOOLEAN NOT NULL,
   sweetness INTEGER NOT NULL CHECK (
     sweetness >= 0

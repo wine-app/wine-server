@@ -15,6 +15,30 @@ pub fn hello_world() -> &'static str {
   "hello world"
 }
 
+use std::fmt::Display;
+
+#[derive(Debug)]
+struct PrependedDisplay<'a, E: Display> (E, &'a str);
+
+impl<T: Display> Display for PrependedDisplay<'_, T> {
+  fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+    write!(f, "{}: {}", self.1, self.0)
+  }
+}
+
+trait PrependError<T, E: Display>{
+  fn prepend_err(self, msg: &str) -> Result<T, PrependedDisplay<E>>;
+}
+
+impl<T, E: Display> PrependError<T, E> for Result<T, E> {
+  fn prepend_err(self, msg: &str) -> Result<T, PrependedDisplay<E>> {
+    match self {
+      Ok(val) => Ok(val),
+      Err(e) => Err(PrependedDisplay(e, msg)),
+    }
+  }
+}
+
 // use self::models::{NewPost, Post};
 
 // pub fn create_post<'a>(conn: &PgConnection, title: String, body: String) -> Post {
