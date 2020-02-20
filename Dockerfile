@@ -5,7 +5,8 @@
 
 FROM rust
 
-RUN rustup default nightly
+RUN rustup default nightly && \
+    cargo install cargo-watch
 
 WORKDIR /workspace
 COPY ./Cargo.toml ./Cargo.lock ./
@@ -13,9 +14,8 @@ RUN mkdir src/
 RUN echo "fn main() { }" > src/main.rs
 RUN cargo build
 
-RUN ls ./target/debug/deps/wine_server*
-
 EXPOSE 8080
+
 
 # WORKDIR /usr/src/app
 # COPY Cargo.toml .

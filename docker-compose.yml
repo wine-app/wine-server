@@ -28,7 +28,7 @@ services:
     ports:
       - 8080:8080
     # Overrides default command so things don't shut down after the process ends.
-    command: sleep infinity
+    command: cargo watch -x 'run --bin start_server'
     environment:
       ROCKET_ENV: development
       DATABASE_URL: "postgres://user:password@db/wine_db"
