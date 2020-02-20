@@ -3,6 +3,8 @@
 #[macro_use] extern crate juniper;
 #[macro_use] extern crate log;
 
+extern crate ndarray;
+extern crate uuid;
 extern crate diesel_derive_enum;
 extern crate dotenv;
 

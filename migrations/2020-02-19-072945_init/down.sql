@@ -6,5 +6,6 @@ DROP TABLE grapes;
 DROP TABLE countries;
 DROP TABLE regions;
 DROP TABLE producers;
+DROP TABLE users;
 DROP TYPE wine_intensity;
 DROP TYPE color;

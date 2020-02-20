@@ -59,6 +59,17 @@ table! {
     use diesel::sql_types::*;
     use crate::models::*;
 
+    users (id) {
+        id -> Int4,
+        facebook_username -> Nullable<Varchar>,
+        google_username -> Nullable<Varchar>,
+    }
+}
+
+table! {
+    use diesel::sql_types::*;
+    use crate::models::*;
+
     wines (id) {
         id -> Int4,
         name -> Varchar,
@@ -89,5 +100,6 @@ allow_tables_to_appear_in_same_query!(
     producers,
     regions,
     tasting_notes,
+    users,
     wines,
 );

@@ -180,23 +180,3 @@ impl From<WineInput> for DbWineInput {
     }
   }
 }
-
-// impl From<Wine> for WineInput {
-//   fn from(item: Wine) -> WineInput {
-//     WineInput {
-// name: item.name,
-// producer: item.producer,
-// vintage: item.vintage,
-// region: item.region,
-// country: item.country,
-// sparkling: item.sparkling,
-// sweetness: item.sweetness,
-// tannin: item.tannin,
-// acid: item.acid,
-// alcohol: item.alcohol,
-// body: item.body,
-// intensity: item.intensity,
-//       composition: item.composition(context: &GraphqlContext)
-//     }
-//   }
-// }

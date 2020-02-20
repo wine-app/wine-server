@@ -23,6 +23,7 @@ services:
       - ./diesel.toml:/workspace/diesel.toml:cached
       - ./Makefile:/workspace/Makefile:cached
       - ./.gitignore:/workspace/.gitignore:cached
+      - ./Cargo.toml:/workspace/Cargo.toml:cached
       - ./Cargo.lock:/workspace/Cargo.lock:cached
       - ./.git:/workspace/.git:cached
     ports:

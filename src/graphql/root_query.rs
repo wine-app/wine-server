@@ -1,10 +1,10 @@
 use juniper::FieldResult;
 use diesel::prelude::*;
 
-use crate::PrependError;
 use crate::models::*;
 use crate::graphql::GraphqlContext;
 use super::wine::Wine as GraphQLWine;
+use super::user::User as GraphQLUser;
 
 pub struct RootQuery;
 
@@ -99,6 +99,22 @@ impl RootQuery {
     let connection = context.db_pool.get()?;
 
     let result: Vec<Wine> = wines.load(&connection)?;
+    Ok(result.into_iter().map(|x| x.into()).collect())
+  }
+
+  fn user(context: &GraphqlContext, id: i32) -> FieldResult<GraphQLUser> {
+    use crate::schema::users::dsl::*;
+    let connection = context.db_pool.get()?;
+
+    let result = users.find(id).get_result::<User>(&connection)?.into();
+    Ok(result)
+  }
+
+  fn users(context: &GraphqlContext) -> FieldResult<Vec<GraphQLUser>> {
+    use crate::schema::users::dsl::*;
+    let connection = context.db_pool.get()?;
+
+    let result: Vec<User> = users.load(&connection)?;
     Ok(result.into_iter().map(|x| x.into()).collect())
   }
 }
