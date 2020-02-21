@@ -68,9 +68,9 @@ CREATE TABLE tasting_notes (
 
 CREATE TABLE users (
   id SERIAL PRIMARY KEY,
-  facebook_username VARCHAR UNIQUE,
+  facebook_user_id VARCHAR UNIQUE,
   google_username VARCHAR UNIQUE,
-  CONSTRAINT must_have_username CHECK (facebook_username IS NOT NULL OR google_username IS NOT NULL)
+  CONSTRAINT must_have_associated_authentication_account CHECK (facebook_user_id IS NOT NULL OR google_username IS NOT NULL)
 );
 
 -- CREATE TABLE reviews (

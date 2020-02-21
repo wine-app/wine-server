@@ -61,7 +61,7 @@ table! {
 
     users (id) {
         id -> Int4,
-        facebook_username -> Nullable<Varchar>,
+        facebook_user_id -> Nullable<Varchar>,
         google_username -> Nullable<Varchar>,
     }
 }
