@@ -27,19 +27,19 @@ pub async fn login(
 ) -> Result<HttpResponse, Error> {
   let user_id = match info {
     LoginParams::Facebook(login_info) => {
-      login_facebook(login_info, context.db_pool).await.unwrap()
+      login_facebook(login_info, context.db_pool.clone()).await.unwrap()
     },
   };
 
   if let None = user_id {
-    HttpResponse.
+    return Ok(HttpResponse::Unauthorized().finish());
   }
 
   let claims = AppClaims {
-    user_id,
+    user_id: user_id.unwrap(),
   };
 
-  encode(&Header::default(), &my_claims, &EncodingKey::from_secret("secret".as_ref()))?;
+  encode(&Header::default(), &claims, &EncodingKey::from_secret("secret".as_ref())).unwrap();
 
   Ok(HttpResponse::Ok().content_type("application/json").finish())
 }

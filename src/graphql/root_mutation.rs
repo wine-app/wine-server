@@ -5,6 +5,7 @@ use juniper::FieldResult;
 use super::*;
 use crate::graphql::wine::*;
 use crate::graphql::user::*;
+use crate::graphql::review::*;
 use crate::PrependError;
 
 pub struct RootMutation;
@@ -239,55 +240,6 @@ impl RootMutation {
     let composition = input.composition.clone();
     let new_wine: DbWineInput = input.into();
 
-    // let all_wines: Vec<DbWine> = wines::dsl::wines.load(&connection)?;
-    // let num_wines = all_wines.len();
-
-    // let A = {
-    //   let row_magnitude: f64 = [
-    //     new_wine.sweetness as f64,
-    //     new_wine.tannin as f64,
-    //     new_wine.acid as f64,
-    //     new_wine.alcohol as f64,
-    //     new_wine.body as f64,
-    //   ]
-    //   .iter()
-    //   .sum();
-
-    //   ndarray::Array1::<f64>::from(vec![
-    //     new_wine.sweetness as f64,
-    //     new_wine.tannin as f64,
-    //     new_wine.acid as f64,
-    //     new_wine.alcohol as f64,
-    //     new_wine.body as f64,
-    //   ]) / row_magnitude
-    // };
-
-    // let M = unsafe {
-    //   let mut M = ndarray::Array2::<f64>::uninitialized((num_wines, 5));
-    //   all_wines
-    //     .into_iter()
-    //     .enumerate()
-    //     .for_each(|(col_ind, wine)| {
-    //       let row_magnitude: f64 = [
-    //         wine.sweetness as f64,
-    //         wine.tannin as f64,
-    //         wine.acid as f64,
-    //         wine.alcohol as f64,
-    //         wine.body as f64,
-    //       ]
-    //       .iter()
-    //       .sum();
-
-    //       M[(0, col_ind)] = wine.sweetness as f64 / row_magnitude;
-    //       M[(1, col_ind)] = wine.tannin as f64 / row_magnitude;
-    //       M[(2, col_ind)] = wine.acid as f64 / row_magnitude;
-    //       M[(3, col_ind)] = wine.alcohol as f64 / row_magnitude;
-    //       M[(4, col_ind)] = wine.body as f64 / row_magnitude;
-    //     });
-    //   M
-    // };
-    // println!("{}", A.dot(&M.t()));
-
     connection.transaction(|| {
       let wine_insert_result = diesel::insert_into(wines::table)
         .values(new_wine)
@@ -361,5 +313,43 @@ impl RootMutation {
 
       Ok(inserted_wine.into())
     })
+  }
+
+  fn create_review(context: &GraphqlContext, wine_id: i32, liked: bool) -> FieldResult<Review> {
+    use crate::models::Review as DbReview;
+    use crate::schema::reviews;
+    let connection = context.db_pool.get()?;
+
+    let insert_item = DbReview {
+      user_id: context.user_id.clone(),
+      wine_id,
+      liked,
+    };
+
+    let inserted_item = diesel::insert_into(reviews::table)
+      .values(insert_item)
+      .get_result::<DbReview>(&connection)
+      .prepend_err("Error creating new review")?;
+
+    Ok(inserted_item.into())
+  }
+
+  fn update_review(context: &GraphqlContext, wine_id: i32, liked: bool) -> FieldResult<Review> {
+    use crate::models::Review as DbReview;
+    use crate::schema::reviews::dsl::reviews;
+    let connection = context.db_pool.get()?;
+
+    let update_item = DbReview {
+      user_id: context.user_id.clone(),
+      wine_id: wine_id,
+      liked: liked,
+    };
+
+    let result: DbReview = diesel::update(reviews.find((&wine_id, &context.user_id)))
+      .set(update_item)
+      .get_result(&connection)
+      .prepend_err("Error updating a review")?;
+
+    Ok(result.into())
   }
 }

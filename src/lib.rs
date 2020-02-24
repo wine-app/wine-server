@@ -13,6 +13,7 @@ pub mod models;
 pub mod graphql;
 pub mod schema;
 pub mod routes;
+pub mod algorithm;
 
 pub fn hello_world() -> &'static str {
   "hello world"

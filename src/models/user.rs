@@ -1,4 +1,3 @@
-
 use crate::schema::*;
 
 #[derive(Identifiable, Queryable, Associations, Debug)]
