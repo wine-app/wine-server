@@ -1,7 +1,7 @@
 use crate::db::PgPool;
 use actix_identity::Identity;
 use actix_web::{get, web, Error, HttpResponse};
-use jsonwebtoken::{decode, encode, Algorithm, DecodingKey, EncodingKey, Header, Validation};
+use jsonwebtoken::{encode, EncodingKey, Header};
 use serde_derive::{Deserialize, Serialize};
 use std::env;
 use std::sync::Arc;
@@ -25,12 +25,13 @@ pub async fn login(
   id: Identity,
   web::Query(info): web::Query<LoginParams>,
 ) -> Result<HttpResponse, Error> {
+  println!("{:?}", info);
   let user_id = match info {
     LoginParams::Facebook(login_info) => {
       login_facebook(login_info, context.db_pool.clone()).await.unwrap()
     },
   };
-
+  println!("{:?}", user_id);
   if let None = user_id {
     return Ok(HttpResponse::Unauthorized().finish());
   }
@@ -39,7 +40,8 @@ pub async fn login(
     user_id: user_id.unwrap(),
   };
 
-  encode(&Header::default(), &claims, &EncodingKey::from_secret("secret".as_ref())).unwrap();
+  let json_web_token = encode(&Header::default(), &claims, &EncodingKey::from_secret("secret".as_ref())).unwrap();
+  id.remember(json_web_token);
 
   Ok(HttpResponse::Ok().content_type("application/json").finish())
 }
@@ -54,6 +56,7 @@ async fn login_facebook(
   login_params: FacebookAuthLoginInfo,
   db_pool: Arc<PgPool>
 ) -> Result<Option<i32>, Box<dyn std::error::Error>> {
+  println!("login params {:?}", login_params);
   let user_id = if let Some(code) = login_params.code {
     let facebook_access_token = get_facebook_client_access_token(code).await?;
     // println!("Facebook Access Token: {}", facebook_access_token);
@@ -106,6 +109,7 @@ async fn get_facebook_client_access_token(code: String) -> Result<String, Box<dy
     serde_urlencoded::to_string(&facebook_access_token_request_params)?
   );
   let return_val = reqwest::get(&uri).await?.text().await?;
+  println!("Return val {:?}", return_val);
   let facebook_access_token_response: FacebookAccessTokenResponse =
     serde_json::from_str(&return_val)?;
   Ok(facebook_access_token_response.access_token)
@@ -147,7 +151,7 @@ async fn get_facebook_user_id(access_token: &str) -> Result<String, Box<dyn std:
   let return_val = reqwest::get(&uri).await?.text().await?;
   let facebook_token_inspect_response: FacebookTokenInspectResponse =
     serde_json::from_str(&return_val)?;
-  println!("Inspect Response {:?}", facebook_token_inspect_response);
+  // println!("Inspect Response {:?}", facebook_token_inspect_response);
   Ok(facebook_token_inspect_response.data.user_id)
 }
 
@@ -164,7 +168,7 @@ async fn get_facebook_user_info(access_token: &str, user_id: &str) -> Result<Fac
     user_id,
     access_token
   );
-  println!("user query {:?}", uri);
+  // println!("user query {:?}", uri);
   let return_val = reqwest::get(&uri).await?.text().await?;
   let facebook_user_info: FacebookUserInfo =
     serde_json::from_str(&return_val)?;

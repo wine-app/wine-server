@@ -8,7 +8,7 @@ use std::sync::Arc;
 
 use wine_server::db::establish_pool;
 use wine_server::graphql::{RootMutation, RootQuery};
-use wine_server::routes::{graphiql, graphql, index, login, logout, RequestContext};
+use wine_server::routes::{graphiql, graphql, index, login, logout, RequestContext, login_page};
 
 type Schema = RootNode<'static, RootQuery, RootMutation>;
 
@@ -38,6 +38,7 @@ async fn main() -> io::Result<()> {
           .secure(false),
       ))
       .wrap(middleware::Logger::default())
+      .service(login_page)
       .service(logout)
       .service(login)
       .service(index)
